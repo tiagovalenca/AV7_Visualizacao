@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  db:
+    build:
+      context: ./database
+    restart: always
+    environment:
+      POSTGRES_DB: olistdb
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  metabase:
+    image: metabase/metabase
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - metabase_data:/metabase-data
+    environment:
+      MB_DB_TYPE: postgres   
+      MB_DB_DBNAME: olistdb  
+      MB_DB_PORT: 5432
+      MB_DB_USER: user  
+      MB_DB_PASS: password
+      MB_DB_HOST: db
+
+volumes:
+  postgres:
+  metabase_data:
