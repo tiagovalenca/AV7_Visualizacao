@@ -1,9 +1,15 @@
 # AV7_Visualizacao
 Ambiente para a AV7
 
-## Cadastro Metabase
+## Cadastro Banco de dados no Metabase
+type: Postgresql
+
 host_bd: db
+
 port: 5432
+
 name: olistdb
+
 user: user
+
 password: password
