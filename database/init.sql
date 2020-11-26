@@ -1,5 +1,23 @@
 CREATE SCHEMA olist;
 
+CREATE TABLE olist.state_data(
+  uf VARCHAR NOT NULL,
+  state_name VARCHAR NOT NULL,
+  capital VARCHAR NOT NULL,
+  region VARCHAR NOT NULL,
+  area DOUBLE PRECISION NOT NULL,
+  population INT NOT NULL,
+  demographic_density DOUBLE PRECISION NOT NULL,
+  cities_count INT NOT NULL,
+  GDP DOUBLE PRECISION NOT NULL,
+  GDP_rate DOUBLE PRECISION NOT NULL,
+  poverty DOUBLE PRECISION NOT NULL,
+  latitude DOUBLE PRECISION NOT NULL,
+  longitude DOUBLE PRECISION NOT NULL,
+  CONSTRAINT state_pk
+    PRIMARY KEY(uf)
+);
+
 
 CREATE TABLE olist.product_category_name_translation (
   product_category_name          VARCHAR  NOT NULL,
@@ -16,7 +34,10 @@ CREATE TABLE olist.geolocation (
   geolocation_city             VARCHAR           NOT NULL,
   geolocation_state            VARCHAR           NOT NULL,
   CONSTRAINT geolocation_pk
-    PRIMARY KEY (geolocation_zip_code_prefix, geolocation_city, geolocation_state)
+    PRIMARY KEY (geolocation_zip_code_prefix, geolocation_city, geolocation_state),
+  CONSTRAINT state_fk
+    FOREIGN KEY (geolocation_state)
+      REFERENCES olist.state_data (uf)
 );
 
 
@@ -133,6 +154,24 @@ CREATE TABLE olist.order_items (
       REFERENCES olist.sellers (seller_id)
 );
 
+COPY olist.state_data(
+  uf,
+  state_name,
+  capital,
+  region,
+  area,
+  population,
+  demographic_density,
+  cities_count,
+  GDP,
+  GDP_rate,
+  poverty,
+  latitude,
+  longitude
+)
+FROM '/var/lib/postgresql/states.csv'
+DELIMITER ','
+CSV HEADER;
 
 COPY olist.product_category_name_translation(
   product_category_name,
