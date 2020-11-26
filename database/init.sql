@@ -286,3 +286,23 @@ COPY olist.order_items(
 FROM '/var/lib/postgresql/olist_order_items_dataset.csv'
 DELIMITER ','
 CSV HEADER;
+
+CREATE MATERIALIZED VIEW olist."Seller_view"
+TABLESPACE pg_default
+AS
+ SELECT s.seller_id,
+    s.seller_city,
+    s.seller_state,
+    o.order_id,
+    pay.payment_value,
+    st.population,
+    st.gdp,
+    st.gdp_rate
+   FROM olist.sellers s,
+    olist.order_items o,
+    olist.order_payments pay,
+    olist.state_data st
+WITH DATA;
+
+ALTER TABLE olist."Seller_view"
+    OWNER TO "user";
