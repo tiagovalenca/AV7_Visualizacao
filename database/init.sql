@@ -293,16 +293,34 @@ AS
  SELECT s.seller_id,
     s.seller_city,
     s.seller_state,
-    o.order_id,
-    pay.payment_value,
     st.population,
     st.gdp,
-    st.gdp_rate
+    st.gdp_rate,
+    geo.geolocation_lat,
+    geo.geolocation_lng
    FROM olist.sellers s,
-    olist.order_items o,
-    olist.order_payments pay,
-    olist.state_data st
+    olist.state_data st,
+    olist.geolocation geo
+  WHERE (((s.seller_state)::text = (st.uf)::text) AND ((geo.geolocation_zip_code_prefix)::text = (s.seller_zip_code_prefix)::text));
 WITH DATA;
 
 ALTER TABLE olist."Seller_view"
+    OWNER TO "user";
+
+CREATE MATERIALIZED VIEW olist."Customer_view"
+TABLESPACE pg_default
+AS
+ SELECT cus.customer_id,
+    cus.customer_state,
+    geo.geolocation_lat,
+    geo.geolocation_lng,
+    st.gdp_rate,
+    st.poverty
+   FROM olist.customers cus,
+    olist.geolocation geo,
+    olist.state_data st
+  WHERE (((geo.geolocation_zip_code_prefix)::text = (cus.customer_zip_code_prefix)::text) AND ((cus.customer_state)::text = (st.uf)::text));
+WITH DATA;
+
+ALTER TABLE olist."Customer_view"
     OWNER TO "user";
